@@ -1,5 +1,5 @@
 import express from 'express';
-import { addItemToCart, getActiveCartForUser, updateItemInCart } from '../services/cartServices.js';
+import { addItemToCart, clearCart, deleteItemInCart, getActiveCartForUser, updateItemInCart } from '../services/cartServices.js';
 import validateJwt from '../middelwares/validateJWT.js';
 import { ExtenRequest } from '../middelwares/validateJWT.js';
 
@@ -7,24 +7,37 @@ import { ExtenRequest } from '../middelwares/validateJWT.js';
 
 const routes = express.Router();
 
-routes.get("/",validateJwt, async (req: ExtenRequest, res: express.Response) => {
+routes.get("/", validateJwt, async (req: ExtenRequest, res: express.Response) => {
     const userId = req.user._id;
     const cart = await getActiveCartForUser({ userId });
     res.status(200).send(cart);
 })
 
-routes.post("/items",validateJwt,async(req:ExtenRequest,res:express.Response)=>{
-     const userId = req.user._id;
-     const { productId, quantity } = req.body;
-     const response= await addItemToCart({userId,productId,quantity});
-     res.status(response.statusCode).send(response.data);
+routes.post("/items", validateJwt, async (req: ExtenRequest, res: express.Response) => {
+    const userId = req.user._id;
+    const { productId, quantity } = req.body;
+    const response = await addItemToCart({ userId, productId, quantity });
+    res.status(response.statusCode).send(response.data);
 })
 
-routes.put("/items",validateJwt,async(req:ExtenRequest,res:express.Response)=>{
-     const userId = req.user._id;
-     const { productId, quantity } = req.body;
-     const response= await updateItemInCart({userId,productId,quantity});
-     res.status(response.statusCode).send(response.data);
+routes.put("/items", validateJwt, async (req: ExtenRequest, res: express.Response) => {
+    const userId = req.user._id;
+    const { productId, quantity } = req.body;
+    const response = await updateItemInCart({ userId, productId, quantity });
+    res.status(response.statusCode).send(response.data);
+})
+
+routes.delete("/items/:productId", validateJwt, async (req: ExtenRequest, res: express.Response) => {
+    const userId = req.user._id;
+    const { productId } = req.params;
+    const response = await deleteItemInCart({ userId, productId });
+    res.status(response.statusCode).send(response.data);
+})
+
+routes.delete("/", validateJwt, async (req: ExtenRequest, res: express.Response) => {
+    const userId = req.user._id;
+    const response = await clearCart({ userId });
+    res.status(response.statusCode).send(response.data);
 })
 
 export default routes;
