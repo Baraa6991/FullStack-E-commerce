@@ -7,9 +7,10 @@ interface RegisterParame {
     lastName: string;
     email: string;
     password: string;
+    address:string;
 }
 
-export const register = async ({ firstName, lastName, email, password }: RegisterParame) => {
+export const register = async ({ firstName, lastName, email, password,address }: RegisterParame) => {
     const findUser = await userModel.findOne({ email });
     if (findUser) {
         return { data: "User already exists", statusCode: 400 }
@@ -20,7 +21,8 @@ export const register = async ({ firstName, lastName, email, password }: Registe
         firstName,
         lastName,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        address
     });
     await newUser.save();
     return { data: generatoJWT({ firstName, lastName, email }), statusCode: 200 };
